@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from config import db_url_object, echo
+from config import REAL_DATABASE_URL, echo
 
 
 class DatabaseHelper:
@@ -23,4 +23,4 @@ class DatabaseHelper:
             await session.close()
 
 
-db_helper = DatabaseHelper(url=db_url_object, echo=echo)
+db_helper = DatabaseHelper(url=REAL_DATABASE_URL, echo=echo)
