@@ -4,17 +4,23 @@ from datetime import datetime
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
-from pycbrf import ExchangeRates
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from pycbrf import ExchangeRates
 
 from button import button_else, button_start, del_reply_markup, setting_button_subscribe
 from config import BOT_TOKEN
-from db.models.crud import add_data_in_history, check_user_in_user_table, add_user, check_subscribe, subscribe_on, \
-    subscribe_off, get_history
-from message_text import start_text, select_an_action_text
+from db.models.crud import (
+    add_data_in_history,
+    check_user_in_user_table,
+    add_user,
+    check_subscribe,
+    subscribe_on,
+    subscribe_off,
+    get_history)
+from start_message_text import start_text
 
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=BOT_TOKEN)
+main_bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 scheduler = AsyncIOScheduler()
 
@@ -35,7 +41,7 @@ async def start_or_not_register_command(message: types.Message):
         await message.answer(start_text, reply_markup=button_start())
 
 
-async def send_message_cron(bot: Bot, chat_id: int):
+async def send_message_cron(bot: main_bot, chat_id: int):
     current_rate = await get_current_rate()
     date = datetime.utcnow()
     await add_data_in_history(values=current_rate, user_id=chat_id, date=date)
@@ -60,13 +66,13 @@ async def current_rate_callback(callback: types.CallbackQuery):
                               user_id=callback.message.chat.id,
                               date=date)
     await callback.message.answer(f"По данным ЦБ РФ курc доллара: {value} руб.")
-    await callback.message.answer(select_an_action_text, reply_markup=button_else())
+    await callback.message.answer("Выберите действие:", reply_markup=button_else())
     await del_reply_markup(callback)
 
 
 @dp.callback_query(F.data == "setting_subscribe")
 async def setting_subscribe_callback(callback: types.CallbackQuery):
-    await callback.message.answer(select_an_action_text, reply_markup=setting_button_subscribe())
+    await callback.message.answer("Выберите действие:", reply_markup=setting_button_subscribe())
     await del_reply_markup(callback)
 
 
@@ -74,7 +80,7 @@ async def setting_subscribe_callback(callback: types.CallbackQuery):
 async def subscribe_on_callback(callback: types.CallbackQuery):
     if await check_subscribe(callback.message.chat.id):
         await callback.message.answer(f"Вы уже подписаны на рассылку!")
-        await callback.message.answer(select_an_action_text, reply_markup=button_else())
+        await callback.message.answer("Выберите действие:", reply_markup=button_else())
         await del_reply_markup(callback)
     else:
         await subscribe_on(callback.message.chat.id)
@@ -84,9 +90,9 @@ async def subscribe_on_callback(callback: types.CallbackQuery):
                           hour=12,
                           minute=10,
                           start_date=datetime.utcnow(),
-                          kwargs={"bot": bot, "chat_id": callback.message.chat.id},
+                          kwargs={"bot": main_bot, "chat_id": callback.message.chat.id},
                           id=str(callback.message.chat.id))
-        await callback.message.answer(select_an_action_text, reply_markup=button_else())
+        await callback.message.answer("Выберите действие:", reply_markup=button_else())
         await del_reply_markup(callback)
 
 
@@ -96,11 +102,11 @@ async def subscribe_off_callback(callback: types.CallbackQuery):
         await subscribe_off(callback.message.chat.id)
         scheduler.remove_job(f"{callback.message.chat.id}")
         await callback.message.answer(f"Вы успешно отписались от рассылки.")
-        await callback.message.answer(select_an_action_text, reply_markup=button_else())
+        await callback.message.answer("Выберите действие:", reply_markup=button_else())
         await del_reply_markup(callback)
     else:
         await callback.message.answer(f"Вы не подписаны на рассылку.")
-        await callback.message.answer(select_an_action_text, reply_markup=button_else())
+        await callback.message.answer("Выберите действие:", reply_markup=button_else())
         await del_reply_markup(callback)
 
 
@@ -115,13 +121,13 @@ async def history_callback(callback: types.CallbackQuery):
         histories.append(f"{index}. Дата и время: {date}, курс доллара: {value}")
 
     await callback.message.answer("\n".join(histories))
-    await callback.message.answer(select_an_action_text, reply_markup=button_else())
+    await callback.message.answer("Выберите действие:", reply_markup=button_else())
     await del_reply_markup(callback)
 
 
 async def main():
     scheduler.start()
-    await dp.start_polling(bot)
+    await dp.start_polling(main_bot)
 
 
 if __name__ == "__main__":
