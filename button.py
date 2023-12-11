@@ -6,44 +6,24 @@ from config import BOT_TOKEN
 bot = Bot(BOT_TOKEN)
 
 
-def button_start():
-    builder = InlineKeyboardBuilder()
-    builder.row(types.InlineKeyboardButton(
-        text="Узнать текущий курс доллара",
-        callback_data="current_rate"),
-        width=1
+def keyboard_start():
+    kb = [
+        [
+            types.KeyboardButton(text="Узнать текущий курс доллара")
+        ],
+        [
+            types.KeyboardButton(text="Настройка подписки")
+        ],
+        [
+            types.KeyboardButton(text="Посмотреть историю запросов")
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        input_field_placeholder="Нажмите на нужную кнопку"
     )
-    builder.row(types.InlineKeyboardButton(
-        text="Настройка подписки",
-        callback_data="setting_subscribe"),
-        width=1
-    )
-    builder.row(types.InlineKeyboardButton(
-        text="Посмотреть историю запросов",
-        callback_data="history"),
-        width=1
-    )
-    return builder.as_markup()
-
-
-def button_else():
-    builder = InlineKeyboardBuilder()
-    builder.row(types.InlineKeyboardButton(
-        text="Узнать текущий курс доллара",
-        callback_data="current_rate"),
-        width=1
-    )
-    builder.row(types.InlineKeyboardButton(
-        text="Настройка подписки",
-        callback_data="setting_subscribe"),
-        width=1
-    )
-    builder.row(types.InlineKeyboardButton(
-        text="Посмотреть историю запросов",
-        callback_data="history"),
-        width=1
-    )
-    return builder.as_markup()
+    return keyboard
 
 
 def setting_button_subscribe():
