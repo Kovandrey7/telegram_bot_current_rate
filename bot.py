@@ -98,7 +98,7 @@ async def subscribe_on_callback(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data == "subscribe_off")
 async def subscribe_off_callback(callback: types.CallbackQuery):
-    if check_subscribe(callback.message.chat.id):
+    if await check_subscribe(callback.message.chat.id):
         await subscribe_off(callback.message.chat.id)
         scheduler.remove_job(f"{callback.message.chat.id}")
         await callback.message.answer(f"Вы успешно отписались от рассылки.")
@@ -127,6 +127,7 @@ async def history_callback(callback: types.CallbackQuery):
 
 async def main():
     scheduler.start()
+    await main_bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(main_bot)
 
 
