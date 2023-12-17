@@ -1,10 +1,6 @@
 from aiogram import Bot, types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from config import BOT_TOKEN
-
-bot = Bot(BOT_TOKEN)
-
 
 def keyboard_start():
     kb = [
@@ -39,11 +35,3 @@ def setting_button_subscribe():
         width=1
     )
     return builder.as_markup()
-
-
-async def del_reply_markup(call):
-    await bot.edit_message_reply_markup(
-        chat_id=call.message.chat.id,
-        message_id=call.message.message_id,
-        reply_markup=None
-    )
