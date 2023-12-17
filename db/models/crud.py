@@ -1,10 +1,10 @@
+import asyncio
 from datetime import datetime
-from decimal import Decimal
 
 from sqlalchemy import select, update
 
 from db.db_helper import db_helper
-from db.models import User, History
+from db.models import User, History, CurrentRate
 
 
 async def add_user(user_name: str, user_id: int, subscribe: bool = False):
@@ -21,7 +21,7 @@ async def check_user_in_user_table(user_id: int) -> True | False:
         return True if res else False
 
 
-async def add_data_in_history(values: Decimal, user_id: int, date: datetime):
+async def add_data_in_history(values: float, user_id: int, date: datetime):
     async with db_helper.session_factory() as session:
         history = History(date=date, values=values, user_id=user_id)
         session.add(history)
@@ -57,6 +57,36 @@ async def subscribe_off(user_id: int):
         await session.commit()
 
 
-if __name__ == '__main__':
-    # asyncio.run()
+async def add_usd_in_current_rate(value, currency_name: str = "USD"):
+    async with db_helper.session_factory() as session:
+        stmt = select(CurrentRate.currency_name).where(CurrentRate.currency_name == currency_name)
+        if await session.scalar(stmt):
+            stmt_2 = update(CurrentRate).where(CurrentRate.currency_name == currency_name).values(value=value)
+            await session.execute(stmt_2)
+            await session.commit()
+        else:
+            current_usd = CurrentRate(currency_name=currency_name, value=value)
+            session.add(current_usd)
+            await session.commit()
+
+
+async def update_usd_current_rate(value, currency_name: str = "USD"):
+    async with db_helper.session_factory() as session:
+        stmt = update(CurrentRate).where(CurrentRate.currency_name == currency_name).values(value=value)
+        await session.execute(stmt)
+        await session.commit()
+
+
+async def get_current_rate_usd(currency_name: str = "USD"):
+    async with db_helper.session_factory() as session:
+        stmt = select(CurrentRate.value).where(CurrentRate.currency_name == currency_name)
+        current_rate_usd = await session.scalar(stmt)
+        return current_rate_usd
+
+
+async def main():
     pass
+
+if __name__ == '__main__':
+    asyncio.run(main())
+    # pass
