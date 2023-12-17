@@ -8,7 +8,7 @@ from db.models.crud import update_usd_current_rate
 
 
 async def update_usd_info_cron():
-    @aiocron.crontab("0 * * * *")
+    @aiocron.crontab("0 */2 * * *")
     async def update_usd_info():
         current_usd = await get_current_usd()
         await update_usd_current_rate(value=current_usd)
