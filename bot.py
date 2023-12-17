@@ -5,7 +5,7 @@ from datetime import datetime
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
 
-from button import setting_button_subscribe, keyboard_start
+from keyboard import setting_button_subscribe, keyboard_start
 from cb_rate import get_current_usd
 from config import BOT_TOKEN
 from db.models.crud import (
