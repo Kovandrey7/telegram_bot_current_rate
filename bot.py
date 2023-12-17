@@ -4,10 +4,9 @@ from datetime import datetime
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from pycbrf import ExchangeRates
 
 from button import setting_button_subscribe, keyboard_start
+from cb_rate import get_current_usd
 from config import BOT_TOKEN
 from db.models.crud import (
     add_data_in_history,
@@ -16,21 +15,13 @@ from db.models.crud import (
     check_subscribe,
     subscribe_on,
     subscribe_off,
-    get_history)
+    get_history, get_current_rate_usd, add_usd_in_current_rate)
+from scheduler import update_usd_info_cron, send_message_cron
 from start_message_text import start_text
 
 logging.basicConfig(level=logging.INFO)
 main_bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
-scheduler = AsyncIOScheduler()
-
-
-async def get_current_rate():
-    today = str(datetime.now().date())
-    rates = ExchangeRates(today)
-    result = rates["USD"]
-    current_rate = result.value
-    return current_rate
 
 
 async def start_or_not_register_command(message: types.Message):
@@ -41,13 +32,6 @@ async def start_or_not_register_command(message: types.Message):
         await message.answer(start_text, reply_markup=keyboard_start())
 
 
-async def send_message_cron(bot: main_bot, chat_id: int):
-    current_rate = await get_current_rate()
-    date = datetime.utcnow()
-    await add_data_in_history(values=current_rate, user_id=chat_id, date=date)
-    await bot.send_message(chat_id, f"По данным ЦБ РФ курc доллара: {current_rate} руб.")
-
-
 @dp.message(Command("start"))
 async def start(message: types.Message):
     await start_or_not_register_command(message)
@@ -55,8 +39,8 @@ async def start(message: types.Message):
 
 @dp.message(F.text.lower() == "узнать текущий курс доллара")
 async def current_rate_message(message: types.Message):
-    value = await get_current_rate()
-    date = datetime.utcnow()
+    value = await get_current_rate_usd()
+    date = message.date.now()
     await add_data_in_history(values=value,
                               user_id=message.chat.id,
                               date=date)
@@ -75,13 +59,6 @@ async def subscribe_on_callback(callback: types.CallbackQuery):
         await callback.message.delete()
     else:
         await subscribe_on(callback.message.chat.id)
-        scheduler.add_job(send_message_cron,
-                          trigger="cron",
-                          hour=12,
-                          minute=10,
-                          start_date=datetime.utcnow(),
-                          kwargs={"bot": main_bot, "chat_id": callback.message.chat.id},
-                          id=str(callback.message.chat.id))
         await callback.message.answer(f"Вы подписаны на рассылку сообщений раз в день.")
         await callback.message.delete()
 
@@ -90,7 +67,6 @@ async def subscribe_on_callback(callback: types.CallbackQuery):
 async def subscribe_off_callback(callback: types.CallbackQuery):
     if await check_subscribe(callback.message.chat.id):
         await subscribe_off(callback.message.chat.id)
-        scheduler.remove_job(f"{callback.message.chat.id}")
         await callback.message.answer(f"Вы успешно отписались от рассылки.")
         await callback.message.delete()
 
@@ -107,7 +83,7 @@ async def history_message(message: types.Message):
     for index, history in enumerate(history_list, 1):
         date = datetime.strftime(history[0], "%Y-%m-%d %H:%M:%S")
         value = history[1]
-        histories.append(f"{index}. Дата и время: {date}, курс доллара: {value}")
+        histories.append(f"{index}. Дата и время: {date}, курс доллара: {value} руб.")
 
     await message.answer("\n".join(histories))
 
@@ -118,7 +94,12 @@ async def not_register_command(message: types.Message):
 
 
 async def main():
-    scheduler.start()
+    current_usd = await get_current_usd()
+    await add_usd_in_current_rate(current_usd)
+    task = asyncio.create_task(update_usd_info_cron())
+    task_2 = asyncio.create_task(send_message_cron(main_bot))
+    await task
+    await task_2
     await main_bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(main_bot)
 
