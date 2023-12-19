@@ -13,5 +13,6 @@ class User(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     user_name: Mapped[str] = mapped_column(String(40), nullable=False)
     subscribe: Mapped[bool] = mapped_column(default=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
 
     histories: Mapped[list["History"]] = relationship(back_populates="user")
