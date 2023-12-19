@@ -43,6 +43,23 @@ async def check_subscribe(user_id: int) -> True | False:
         return True if result else False
 
 
+async def check_user_status(user_id: int) -> True | False:
+    async with db_helper.session_factory() as session:
+        stmt = select(User).where(User.user_id == user_id, User.is_active)
+        result = await session.scalar(stmt)
+        return True if result else False
+
+
+async def change_user_status(user_id: int):
+    async with db_helper.session_factory() as session:
+        if await check_user_status(user_id=user_id):
+            stmt = update(User).where(User.user_id == user_id).values(is_active=False)
+        else:
+            stmt = update(User).where(User.user_id == user_id).values(is_active=True)
+        await session.execute(stmt)
+        await session.commit()
+
+
 async def subscribe_on(user_id: int):
     async with db_helper.session_factory() as session:
         stmt = update(User).where(User.user_id == user_id).values(subscribe=True)
