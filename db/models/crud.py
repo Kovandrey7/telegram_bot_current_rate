@@ -7,9 +7,9 @@ from db.db_helper import db_helper
 from db.models import User, History, CurrentRate
 
 
-async def add_user(user_name: str, user_id: int, subscribe: bool = False):
+async def add_user(user_name: str, user_id: int, subscribe: bool = False, is_active: bool = True):
     async with db_helper.session_factory() as session:
-        user = User(user_id=user_id, user_name=user_name, subscribe=subscribe)
+        user = User(user_id=user_id, user_name=user_name, subscribe=subscribe, is_active=is_active)
         session.add(user)
         await session.commit()
 
