@@ -6,6 +6,7 @@ from aiogram import Bot, Dispatcher
 from cb_rate import get_current_usd
 from config import BOT_TOKEN
 from db.models.crud import add_usd_in_current_rate
+from filters import blocked_bot
 from handlers import user_handlers, callback_query
 from scheduler.scheduler import update_usd_info_cron, send_message_cron
 
@@ -16,6 +17,7 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 dp.include_router(user_handlers.router)
 dp.include_router(callback_query.router)
+dp.include_router(blocked_bot.router)
 
 
 async def main():
