@@ -104,6 +104,7 @@ async def get_current_rate_usd(currency_name: str = "USD"):
 async def main():
     pass
 
+
 if __name__ == '__main__':
     asyncio.run(main())
     # pass
