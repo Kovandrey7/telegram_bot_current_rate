@@ -13,9 +13,13 @@ if TYPE_CHECKING:
 
 class History(Base):
     history_id: Mapped[int] = mapped_column(primary_key=True)
-    date: Mapped[datetime] = mapped_column(server_default=func.now(), default=datetime.now)
+    date: Mapped[datetime] = mapped_column(
+        server_default=func.now(), default=datetime.now
+    )
     values: Mapped[float]
-    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("user.user_id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("user.user_id"), nullable=False
+    )
 
     user: Mapped["User"] = relationship(back_populates="histories")
 

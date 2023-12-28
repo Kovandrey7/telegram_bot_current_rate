@@ -19,9 +19,16 @@ class User(Base):
     histories: Mapped[list["History"]] = relationship(back_populates="user")
 
 
-async def add_user(user_name: str, user_id: int, subscribe: bool = False, is_active: bool = True) -> None:
+async def add_user(
+    user_name: str, user_id: int, subscribe: bool = False, is_active: bool = True
+) -> None:
     async with db_helper.session_factory() as session:
-        user = User(user_id=user_id, user_name=user_name, subscribe=subscribe, is_active=is_active)
+        user = User(
+            user_id=user_id,
+            user_name=user_name,
+            subscribe=subscribe,
+            is_active=is_active,
+        )
         session.add(user)
         await session.commit()
 

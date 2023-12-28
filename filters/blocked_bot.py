@@ -17,4 +17,7 @@ async def process_user_blocked_bot(event: ChatMemberUpdated):
 async def process_user_unblocked_bot(event: ChatMemberUpdated, bot):
     await change_user_status(user_id=event.from_user.id)
     print(f"Пользователь {event.from_user.id} разблокировал бота")
-    await bot.send_message(chat_id=event.from_user.id, text=f'{event.from_user.first_name}, Добро пожаловать обратно!')
+    await bot.send_message(
+        chat_id=event.from_user.id,
+        text=f"{event.from_user.first_name}, Добро пожаловать обратно!",
+    )

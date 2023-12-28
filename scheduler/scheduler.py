@@ -29,4 +29,6 @@ async def send_message_cron(bot):
             date = datetime.now()
             for id_user in id_list:
                 await add_data_in_history(current_usd, id_user, date)
-                await bot.send_message(id_user, f"По данным ЦБ РФ курc доллара: {current_usd} руб.")
+                await bot.send_message(
+                    id_user, f"По данным ЦБ РФ курc доллара: {current_usd} руб."
+                )

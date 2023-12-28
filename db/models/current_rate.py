@@ -13,9 +13,15 @@ class CurrentRate(Base):
 
 async def add_usd_in_current_rate(value, currency_name: str = "USD") -> None:
     async with db_helper.session_factory() as session:
-        stmt = select(CurrentRate.currency_name).where(CurrentRate.currency_name == currency_name)
+        stmt = select(CurrentRate.currency_name).where(
+            CurrentRate.currency_name == currency_name
+        )
         if await session.scalar(stmt):
-            stmt_2 = update(CurrentRate).where(CurrentRate.currency_name == currency_name).values(value=value)
+            stmt_2 = (
+                update(CurrentRate)
+                .where(CurrentRate.currency_name == currency_name)
+                .values(value=value)
+            )
             await session.execute(stmt_2)
             await session.commit()
         else:
@@ -26,13 +32,19 @@ async def add_usd_in_current_rate(value, currency_name: str = "USD") -> None:
 
 async def update_usd_current_rate(value, currency_name: str = "USD") -> None:
     async with db_helper.session_factory() as session:
-        stmt = update(CurrentRate).where(CurrentRate.currency_name == currency_name).values(value=value)
+        stmt = (
+            update(CurrentRate)
+            .where(CurrentRate.currency_name == currency_name)
+            .values(value=value)
+        )
         await session.execute(stmt)
         await session.commit()
 
 
 async def get_current_rate_usd(currency_name: str = "USD") -> float:
     async with db_helper.session_factory() as session:
-        stmt = select(CurrentRate.value).where(CurrentRate.currency_name == currency_name)
+        stmt = select(CurrentRate.value).where(
+            CurrentRate.currency_name == currency_name
+        )
         current_rate_usd = await session.scalar(stmt)
         return current_rate_usd

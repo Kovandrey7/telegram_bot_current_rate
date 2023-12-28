@@ -29,10 +29,8 @@ async def start(message: types.Message):
 @router.message(F.text.lower() == "узнать текущий курс доллара", UserInDatabase())
 async def current_rate_message(message: types.Message):
     value = await get_current_rate_usd()
-    date = message.date.now()  #
-    await add_data_in_history(values=value,
-                              user_id=message.chat.id,
-                              date=date)
+    date = message.date.now()
+    await add_data_in_history(values=value, user_id=message.chat.id, date=date)
     await message.answer(f"По данным ЦБ РФ текущий курc доллара: {value} руб.")
 
 
@@ -50,7 +48,9 @@ async def history_message(message: types.Message):
         for index, history in enumerate(history_list, 1):
             date = datetime.strftime(history[0], "%Y-%m-%d %H:%M:%S")
             value = history[1]
-            histories.append(f"{index}. Дата и время: {date}, курс доллара: {value} руб.")
+            histories.append(
+                f"{index}. Дата и время: {date}, курс доллара: {value} руб."
+            )
 
         await message.answer("\n".join(histories))
     else:
