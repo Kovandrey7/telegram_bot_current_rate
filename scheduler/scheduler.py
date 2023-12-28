@@ -6,7 +6,8 @@ from sqlalchemy import select
 from cb_rate import get_current_usd
 from db.db_helper import db_helper
 from db.models import User
-from db.models.crud import update_usd_current_rate, add_data_in_history
+from db.models.current_rate import update_usd_current_rate
+from db.models.history import add_data_in_history
 
 
 async def update_usd_info_cron():

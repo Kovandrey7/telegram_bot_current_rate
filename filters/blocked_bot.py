@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import ChatMemberUpdatedFilter, KICKED, MEMBER
 from aiogram.types import ChatMemberUpdated
 
-from db.models.crud import change_user_status
+from db.models.user import change_user_status
 
 router = Router()
 

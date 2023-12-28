@@ -3,7 +3,9 @@ from datetime import datetime
 from aiogram import types, F, Router
 from aiogram.filters import CommandStart
 
-from db.models.crud import check_user_in_user_table, add_user, get_current_rate_usd, add_data_in_history, get_history
+from db.models.current_rate import get_current_rate_usd
+from db.models.history import add_data_in_history, get_history
+from db.models.user import check_user_in_user_table, add_user
 from filters.user_in_database import UserInDatabase
 from keyboards.keyboard import keyboard_start, setting_button_subscribe
 from start_message_text import start_text
@@ -27,7 +29,7 @@ async def start(message: types.Message):
 @router.message(F.text.lower() == "узнать текущий курс доллара", UserInDatabase())
 async def current_rate_message(message: types.Message):
     value = await get_current_rate_usd()
-    date = message.date.now()
+    date = message.date.now()  #
     await add_data_in_history(values=value,
                               user_id=message.chat.id,
                               date=date)
@@ -53,6 +55,7 @@ async def history_message(message: types.Message):
         await message.answer("\n".join(histories))
     else:
         await message.answer("Ой, ваша история запросов пустая!")
+
 
 @router.message()
 async def not_register_command(message: types.Message):

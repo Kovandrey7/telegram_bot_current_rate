@@ -1,7 +1,7 @@
 from aiogram import types, Router
 from aiogram.filters import BaseFilter
 
-from db.models.crud import check_user_in_user_table
+from db.models.user import check_user_in_user_table
 
 router = Router()
 

@@ -1,6 +1,6 @@
 from aiogram import types, F, Router
 
-from db.models.crud import check_subscribe, subscribe_on, subscribe_off
+from db.models.user import check_subscribe, subscribe_on, subscribe_off
 
 router = Router()
 
