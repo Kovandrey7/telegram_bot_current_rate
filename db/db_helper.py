@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from config import REAL_DATABASE_URL, echo
 
@@ -16,11 +16,6 @@ class DatabaseHelper:
             autocommit=False,
             expire_on_commit=False
         )
-
-    async def session_dependency(self) -> AsyncSession:
-        async with self.session_factory() as session:
-            yield session
-            await session.close()
 
 
 db_helper = DatabaseHelper(url=REAL_DATABASE_URL, echo=echo)
