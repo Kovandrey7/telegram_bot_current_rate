@@ -1,8 +1,23 @@
-from envparse import Env
+from pydantic_settings import BaseSettings
 
-env = Env()
 
-REAL_DATABASE_URL = env.str("REAL_DATABASE_URL")
-BOT_TOKEN = env.str("BOT_TOKEN")
+class Settings(BaseSettings):
+    MODE: str | None
 
-echo = True
+    DB_HOST: str
+    DB_PORT: int
+    DB_USER: str
+    DB_PASS: str
+    DB_NAME: str
+
+    BOT_TOKEN: str
+
+    @property
+    def DB_URL(self):
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()

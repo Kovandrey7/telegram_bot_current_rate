@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from config import REAL_DATABASE_URL, echo
+from config import settings
 
 
 class DatabaseHelper:
@@ -15,4 +15,4 @@ class DatabaseHelper:
         )
 
 
-db_helper = DatabaseHelper(url=REAL_DATABASE_URL, echo=echo)
+db_helper = DatabaseHelper(url=settings.DB_URL, echo=True)

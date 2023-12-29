@@ -20,9 +20,14 @@ pip install -r requirements.txt
 
 
 ## Настройка переменных окружения:
-- BOT_TOKEN - "токен телеграмм бота"
-- REAL_DATABASE_URL - postgresql+asyncpg://"user:pass@localhost/dbname" - 
-вместо user, pass, dbname - указываете данные из environment docker
+
+- В корне проекта создать файл .env и добавить ваши данные (ниже образец):
+  * DB_HOST = localhost
+  * DB_PORT = 5434
+  * DB_USER = postgres
+  * DB_PASS = postgres
+  * DB_NAME = telebot_current_rate 
+  * BOT_TOKEN = токен Telegram-бота
 
 ## Миграции
 - Выполнить миграции для содания таблиц в базе данных с помощью команды "alembic upgrade head"

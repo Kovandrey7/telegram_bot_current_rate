@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 
 from cb_rate import get_current_usd
-from config import BOT_TOKEN
+from config import settings
 from db.models.current_rate import add_usd_in_current_rate
 from filters import blocked_bot
 from handlers import user_handlers, callback_query
@@ -12,7 +12,7 @@ from scheduler.scheduler import update_usd_info_cron, send_message_cron
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token=settings.BOT_TOKEN)
 
 dp = Dispatcher()
 dp.include_router(user_handlers.router)
